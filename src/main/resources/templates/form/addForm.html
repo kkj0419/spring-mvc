@@ -17,20 +17,22 @@
     <div class="py-5 text-center">
         <h2>상품 등록 폼</h2>
     </div>
-
-    <form action="item.html" th:action method="post">
+    <!--  model의 item 변수 등록  -->
+    <form action="item.html" th:action method="post" th:object="${item}">
         <div>
             <label for="itemName">상품명</label>
-            <input type="text" id="itemName" name="itemName" class="form-control" placeholder="이름을 입력하세요">
+            <!--      ${item.itemName}과 같은 역할 -> th:object="${item}" 때문에 사용 가능 /-->
+            <input type="text" id="itemName" name="itemName" th:field="*{itemName}" class="form-control" placeholder="이름을 입력하세요">
         </div>
         <div>
             <label for="price">가격</label>
-            <input type="text" id="price" name="price" class="form-control" placeholder="가격을 입력하세요">
+            <input type="text" id="price" name="price" th:field="*{price}" class="form-control" placeholder="가격을 입력하세요">
         </div>
         <div>
             <label for="quantity">수량</label>
-            <input type="text" id="quantity" name="quantity" class="form-control" placeholder="수량을 입력하세요">
+            <input type="text" id="quantity" name="quantity" th:field="*{quantity}" class="form-control" placeholder="수량을 입력하세요">
         </div>
+        <!--   th:field 를 이용하여 id, name, value를 자동으로 생성 가능    -->
 
         <hr class="my-4">
 
