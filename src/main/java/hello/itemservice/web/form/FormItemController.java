@@ -2,6 +2,7 @@ package hello.itemservice.web.form;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.ItemType;
 import hello.itemservice.domain.item.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,12 @@ public class FormItemController {
     @ModelAttribute("regions")
     public Map<String, String> regions(){
         return regionRepository.getAll();
+    }
+
+    //enum의 모든 정보 model로 전달
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+        return ItemType.values();
     }
 
     @GetMapping
