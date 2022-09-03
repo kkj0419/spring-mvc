@@ -2,6 +2,7 @@ package hello.itemservice.web.form;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/form/items")
@@ -16,6 +18,12 @@ import java.util.List;
 public class FormItemController {
 
     private final ItemRepository itemRepository;
+    private final RegionRepository regionRepository;
+
+    @ModelAttribute("regions")
+    public Map<String, String> regions(){
+        return regionRepository.getAll();
+    }
 
     @GetMapping
     public String items(Model model) {
