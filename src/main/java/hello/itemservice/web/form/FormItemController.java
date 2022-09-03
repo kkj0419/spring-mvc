@@ -1,5 +1,6 @@
 package hello.itemservice.web.form;
 
+import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
@@ -10,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,12 @@ public class FormItemController {
     @ModelAttribute("itemTypes")
     public ItemType[] itemTypes() {
         return ItemType.values();
+    }
+
+    @ModelAttribute
+    public List<DeliveryCode> deliveryCodes(){
+        List<DeliveryCode> codes = Arrays.asList(DeliveryCode.values());
+        return codes;
     }
 
     @GetMapping

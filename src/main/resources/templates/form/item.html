@@ -40,6 +40,17 @@
                readonly>
     </div>
 
+    <!-- select box -->
+    <div>
+        <div>배송 방식</div>
+        <select th:field="${item.deliveryCode}" class="form-select" disabled>
+            <option value="">==배송 방식 선택==</option>
+            <option th:each="deliveryCode : ${deliveryCodeList}" th:value="${deliveryCode.name()}"
+                    th:text="${deliveryCode.description}">
+            </option>
+        </select>
+    </div>
+
     <hr class="my-4">
 
     <!-- single checkbox   -->

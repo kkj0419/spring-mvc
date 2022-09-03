@@ -34,6 +34,17 @@
         </div>
         <!--   th:field 를 이용하여 id, name, value를 자동으로 생성 가능    -->
 
+        <!--  select box   -->
+        <div>
+            <div>배송 방식</div>
+            <select th:field="*{deliveryCode}" class="form-select">
+                <option value="">== 배송 방식 선택 ==</option>
+                <!--   th:each를 이용하여 반복   -->
+                <option th:each="deliveryCode : ${deliveryCodeList}" th:value="${deliveryCode.name()}"
+                        th:text="${deliveryCode.description}"></option>
+            </select>
+        </div>
+
         <hr class="my-4">
 
         <div>판매 여부</div>
