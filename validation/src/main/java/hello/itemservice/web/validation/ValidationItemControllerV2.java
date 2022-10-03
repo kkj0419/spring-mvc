@@ -81,8 +81,7 @@ public class ValidationItemControllerV2 {
 		return "redirect:/validation/v2/items/{itemId}";
 	}
 
-
-	@PostMapping("/add")
+	// @PostMapping("/add")
 	public String addItemV2(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
 		//validate
@@ -104,6 +103,47 @@ public class ValidationItemControllerV2 {
 			int resultPrice = item.getPrice() * item.getQuantity();
 			if (resultPrice < 10000) {
 				result.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다."));
+			}
+		}
+
+		//자동으로 model add
+		if (result.hasErrors()) {
+			return "validation/v2/addForm";
+		}
+
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
+
+	@PostMapping("/add")
+	public String addItemV3(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
+
+		//validate
+		if (!StringUtils.hasText(item.getItemName())) {
+			result.addError(
+				new FieldError("item", "itemName", item.getItemName(), false, new String[] {"required.item.itemName"},
+					null, "상품 이름을 기입해야 합니다."));
+		}
+		if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+			result.addError(
+				new FieldError("item", "price", item.getPrice(), false, new String[] {"range.item.price"},
+					new Object[] {1000, 1000000}, "가격은 1,000 ~ 1,000,000 까지 허용됩니다."));
+		}
+		if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+			result.addError(
+				new FieldError("item", "quantity", item.getQuantity(), false, new String[] {"max.item.quantity"},
+					new Object[] {9999}, "수량은 최대 9,999까지 허용됩니다."));
+		}
+
+		//복합 rule(global error)
+		if (item.getPrice() != null && item.getQuantity() != null) {
+			int resultPrice = item.getPrice() * item.getQuantity();
+			if (resultPrice < 10000) {
+				result.addError(
+					new ObjectError("item", new String[] {"totalPriceMin"}, new Object[] {10000, resultPrice},
+						"가격 * 수량의 합은 10,000원 이상이어야 합니다."));
 			}
 		}
 
