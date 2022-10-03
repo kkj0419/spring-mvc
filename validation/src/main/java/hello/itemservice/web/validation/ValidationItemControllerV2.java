@@ -25,79 +25,111 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ValidationItemControllerV2 {
 
-    private final ItemRepository itemRepository;
+	private final ItemRepository itemRepository;
 
-    @GetMapping
-    public String items(Model model) {
-        List<Item> items = itemRepository.findAll();
-        model.addAttribute("items", items);
-        return "validation/v2/items";
-    }
+	@GetMapping
+	public String items(Model model) {
+		List<Item> items = itemRepository.findAll();
+		model.addAttribute("items", items);
+		return "validation/v2/items";
+	}
 
-    @GetMapping("/{itemId}")
-    public String item(@PathVariable long itemId, Model model) {
-        Item item = itemRepository.findById(itemId);
-        model.addAttribute("item", item);
-        return "validation/v2/item";
-    }
+	@GetMapping("/{itemId}")
+	public String item(@PathVariable long itemId, Model model) {
+		Item item = itemRepository.findById(itemId);
+		model.addAttribute("item", item);
+		return "validation/v2/item";
+	}
 
-    @GetMapping("/add")
-    public String addForm(Model model) {
-        model.addAttribute("item", new Item());
-        return "validation/v2/addForm";
-    }
+	@GetMapping("/add")
+	public String addForm(Model model) {
+		model.addAttribute("item", new Item());
+		return "validation/v2/addForm";
+	}
 
-    @PostMapping("/add")
-    public String addItemV1(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
+	// @PostMapping("/add")
+	public String addItemV1(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
-        //validate
-        if (!StringUtils.hasText(item.getItemName())) {
-            result.addError(new FieldError("item", "itemName", "상품 이름을 기입해야 합니다."));
+		//validate
+		if (!StringUtils.hasText(item.getItemName())) {
+			result.addError(new FieldError("item", "itemName", "상품 이름을 기입해야 합니다."));
 
-        }
-        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
-            result.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용됩니다."));
-        }
-        if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
-            result.addError(new FieldError("item", "quantity", "수량은 최대 9,999까지 허용됩니다."));
-        }
+		}
+		if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+			result.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용됩니다."));
+		}
+		if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+			result.addError(new FieldError("item", "quantity", "수량은 최대 9,999까지 허용됩니다."));
+		}
 
-        //복합 rule(global error)
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                 result.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다."));
-            }
-        }
+		//복합 rule(global error)
+		if (item.getPrice() != null && item.getQuantity() != null) {
+			int resultPrice = item.getPrice() * item.getQuantity();
+			if (resultPrice < 10000) {
+				result.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다."));
+			}
+		}
 
-        //자동으로 model add
-        if (result.hasErrors()) {
-            return "validation/v2/addForm";
-        }
+		//자동으로 model add
+		if (result.hasErrors()) {
+			return "validation/v2/addForm";
+		}
+
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
 
 
-        Item savedItem = itemRepository.save(item);
-        redirectAttributes.addAttribute("itemId", savedItem.getId());
-        redirectAttributes.addAttribute("status", true);
-        return "redirect:/validation/v2/items/{itemId}";
-    }
+	@PostMapping("/add")
+	public String addItemV2(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
-    private boolean hasErrors(Map errors) {
-        return !errors.isEmpty();
-    }
+		//validate
+		if (!StringUtils.hasText(item.getItemName())) {
+			result.addError(
+				new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름을 기입해야 합니다."));
+		}
+		if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+			result.addError(
+				new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용됩니다."));
+		}
+		if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+			result.addError(
+				new FieldError("item", "quantity", item.getQuantity(), false, null, null, "수량은 최대 9,999까지 허용됩니다."));
+		}
 
-    @GetMapping("/{itemId}/edit")
-    public String editForm(@PathVariable Long itemId, Model model) {
-        Item item = itemRepository.findById(itemId);
-        model.addAttribute("item", item);
-        return "validation/v2/editForm";
-    }
+		//복합 rule(global error)
+		if (item.getPrice() != null && item.getQuantity() != null) {
+			int resultPrice = item.getPrice() * item.getQuantity();
+			if (resultPrice < 10000) {
+				result.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다."));
+			}
+		}
 
-    @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
-        itemRepository.update(itemId, item);
-        return "redirect:/validation/v2/items/{itemId}";
-    }
+		//자동으로 model add
+		if (result.hasErrors()) {
+			return "validation/v2/addForm";
+		}
+
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
+
+	@GetMapping("/{itemId}/edit")
+	public String editForm(@PathVariable Long itemId, Model model) {
+		Item item = itemRepository.findById(itemId);
+		model.addAttribute("item", item);
+		return "validation/v2/editForm";
+	}
+
+	@PostMapping("/{itemId}/edit")
+	public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
+		itemRepository.update(itemId, item);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
 
 }
 
