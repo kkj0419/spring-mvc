@@ -9,7 +9,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +30,12 @@ public class ValidationItemControllerV2 {
 
 	private final ItemRepository itemRepository;
 	private final ItemValidator validator;
+
+	//메서드 호출 시마다 자동으로 validator 적용하여 validate
+	@InitBinder
+	public void init(WebDataBinder dataBinder) {
+		dataBinder.addValidators(validator);
+	}
 
 	@GetMapping
 	public String items(Model model) {
@@ -193,11 +202,26 @@ public class ValidationItemControllerV2 {
 		return "redirect:/validation/v2/items/{itemId}";
 	}
 
-	@PostMapping("/add")
+	// @PostMapping("/add")
 	public String addItemV5(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
 		//validate
 		validator.validate(item, result);
+
+		//자동으로 model add
+		if (result.hasErrors()) {
+			return "validation/v2/addForm";
+		}
+
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
+
+	//자동 validation 위한 @Validated 어노테이션
+	@PostMapping("/add")
+	public String addItemV6(@ModelAttribute @Validated Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
 		//자동으로 model add
 		if (result.hasErrors()) {
