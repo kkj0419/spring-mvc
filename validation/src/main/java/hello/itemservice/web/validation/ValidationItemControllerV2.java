@@ -117,7 +117,7 @@ public class ValidationItemControllerV2 {
 		return "redirect:/validation/v2/items/{itemId}";
 	}
 
-	@PostMapping("/add")
+	// @PostMapping("/add")
 	public String addItemV3(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
 
 		//validate
@@ -144,6 +144,40 @@ public class ValidationItemControllerV2 {
 				result.addError(
 					new ObjectError("item", new String[] {"totalPriceMin"}, new Object[] {10000, resultPrice},
 						"가격 * 수량의 합은 10,000원 이상이어야 합니다."));
+			}
+		}
+
+		//자동으로 model add
+		if (result.hasErrors()) {
+			return "validation/v2/addForm";
+		}
+
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		return "redirect:/validation/v2/items/{itemId}";
+	}
+
+	@PostMapping("/add")
+	public String addItemV4(@ModelAttribute Item item, BindingResult result, RedirectAttributes redirectAttributes) {
+
+		//validate
+		if (!StringUtils.hasText(item.getItemName())) {
+			//MessageCodesResolver 를 이용하여 메시지 코드 간소화
+			result.rejectValue("itemName", "required", null, null);
+		}
+		if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+			result.rejectValue("price", "range", new Object[] {1000, 1000000}, null);
+		}
+		if (item.getQuantity() == null || item.getQuantity() >= 9999 || item.getQuantity() <= 0) {
+			result.rejectValue("quantity", "max", new Object[] {9999}, null);
+		}
+
+		//복합 rule(global error)
+		if (item.getPrice() != null && item.getQuantity() != null) {
+			int resultPrice = item.getPrice() * item.getQuantity();
+			if (resultPrice < 10000) {
+				result.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
 			}
 		}
 
