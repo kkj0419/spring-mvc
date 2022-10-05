@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 //메시지 코드 : ScriptAssert.item 로 메시지를 표현할 수도 있음.
-@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총 합이 10000 이상이어야 합니다.")
+// @ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총 합이 10000 이상이어야 합니다.")
 public class Item {
 
     private Long id;

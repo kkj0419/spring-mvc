@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -50,6 +51,14 @@ public class ValidationItemControllerV3 {
 	@PostMapping("/add")
 	public String addItem(@ModelAttribute @Validated Item item, BindingResult result,
 		RedirectAttributes redirectAttributes) {
+
+		//복합 rule(global error)
+		if (item.getPrice() != null && item.getQuantity() != null) {
+			int resultPrice = item.getPrice() * item.getQuantity();
+			if (resultPrice < 10000) {
+				result.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다."));
+			}
+		}
 
 		//자동으로 model add
 		if (result.hasErrors()) {
