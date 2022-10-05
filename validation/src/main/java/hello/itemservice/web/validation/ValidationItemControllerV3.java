@@ -44,6 +44,9 @@ public class ValidationItemControllerV3 {
 		return "validation/v3/addForm";
 	}
 
+	/** @Validated(@Valid) 어노테이션을 통하여 LocalValidatorFactoryBean을 validator로 등록
+	 *  <- 개발자가 따로 등록한 validator가 존재하지 않을 때
+	 * */
 	@PostMapping("/add")
 	public String addItem(@ModelAttribute @Validated Item item, BindingResult result,
 		RedirectAttributes redirectAttributes) {
