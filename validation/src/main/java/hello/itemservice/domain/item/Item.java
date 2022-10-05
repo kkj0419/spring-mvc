@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.ScriptAssert;
 
 import lombok.Data;
 
@@ -14,25 +13,26 @@ import lombok.Data;
 // @ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총 합이 10000 이상이어야 합니다.")
 public class Item {
 
-    private Long id;
+	@NotNull(groups = UpdateValidation.class)
+	private Long id;
 
-    @NotBlank(message = "blank일수 없습니다.")
-    private String itemName;
+	@NotBlank(groups = {SaveValidation.class, UpdateValidation.class})
+	private String itemName;
 
-    @NotNull
-    @Range(min = 1000, max = 1000000)
-    private Integer price;
+	@NotNull(groups = {SaveValidation.class, UpdateValidation.class})
+	@Range(min = 1000, max = 1000000, groups = {SaveValidation.class, UpdateValidation.class})
+	private Integer price;
 
-    @NotNull
-    @Max(9999)
-    private Integer quantity;
+	@NotNull(groups = {SaveValidation.class, UpdateValidation.class})
+	@Max(value = 9999, groups = SaveValidation.class)
+	private Integer quantity;
 
-    public Item() {
-    }
+	public Item() {
+	}
 
-    public Item(String itemName, Integer price, Integer quantity) {
-        this.itemName = itemName;
-        this.price = price;
-        this.quantity = quantity;
-    }
+	public Item(String itemName, Integer price, Integer quantity) {
+		this.itemName = itemName;
+		this.price = price;
+		this.quantity = quantity;
+	}
 }
