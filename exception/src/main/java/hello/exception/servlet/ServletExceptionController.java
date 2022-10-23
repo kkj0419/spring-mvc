@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class ServletExceptionController {
 
+	//WAS까지 RuntimeException 전달 -> WebServerCustomizer에서 catch
 	@GetMapping("/error-ex")
 	public void errorException() {
 		throw new RuntimeException("Runtime Error!!");
