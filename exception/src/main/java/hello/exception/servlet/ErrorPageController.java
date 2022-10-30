@@ -1,6 +1,5 @@
 package hello.exception.servlet;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 

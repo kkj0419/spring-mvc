@@ -20,7 +20,7 @@ public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
 			if (ex instanceof IllegalArgumentException) {
 				log.info("IllegalArgumentException resolver TOOOO 400");
 				//상태 코드 400으로 지정
-				response.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
 				//실행 흐름이 WAS까지 정상적으로 동작하도록 함 -> WAS에서는 전달받은 상태코드 400을 통하여 /error 호출
 				return new ModelAndView();
 			}
