@@ -3,7 +3,9 @@ package hello.exception.api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import hello.exception.customException.BadRequestException;
 import hello.exception.customException.UserException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,10 +33,14 @@ public class ApiExceptionController {
 		return new MemberDTO(id, "helloooo " + id);
 	}
 
+	@GetMapping("/api/response-status-ex1")
+	public String responseStatusEx1() {
+		throw new BadRequestException();
+	}
 
 	@Data
 	@AllArgsConstructor
-	static class MemberDTO{
+	static class MemberDTO {
 		private String memberId;
 		private String name;
 	}
